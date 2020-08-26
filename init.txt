@@ -1,0 +1,10 @@
+# Achtung: Keine Leerzeichen vor und nach =
+#
+offset=7
+material_cost_per_t=650
+Schnittgeschwindigkeit_mm_s=50
+Kosten_Schnitt_euro_min=0.25
+Materialgewicht_g_cm3=7.9
+Materialkosten_euro_t=650
+Gewinnmarge=1.4
+Ausgabespalte=G
