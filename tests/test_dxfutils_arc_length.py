@@ -1,7 +1,7 @@
 from calculator.dxfutils import get_arc_length
 
 
-def test_get_arc_length_angle_180():
+def test_get_arc_length_angle_equal_180():
     # angle = 180 degree
     p1 = (0, 0, 0, 0, 1.0)
     p2 = (5, 0, 0, 0, 0)
