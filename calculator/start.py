@@ -72,8 +72,8 @@ def run():
         configuration = Configuration(**load_from_init_file(args.init_file))
 
     # set correct default values in else-branch or remove if _ else _
-    excel_file_path = args.excel_file if args.excel_file else '../docs/Excel.xlsx'
-    dxf_files_path = args.dxf_path if args.dxf_path else '../docs/'
+    excel_file_path = args.excel_file if args.excel_file else './docs/Excel.xlsx'
+    dxf_files_path = args.dxf_path if args.dxf_path else './docs/'
 
     try:
         xlsx = openpyxl.load_workbook(excel_file_path)
@@ -112,7 +112,7 @@ def run():
             print(f'Kosten für {Liefermenge.value} x {Benennung.value}: {round(cost, 2)}€')
             print("==============================================================")
 
-        xlsx.save('../docs/output.xlsx')
+        xlsx.save('./docs/output.xlsx')
         return sum_of_all_cost
 
     except Exception as e:

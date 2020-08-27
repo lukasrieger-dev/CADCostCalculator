@@ -84,7 +84,7 @@ def get_polyline_length(polyline):
             x2, y2, start2, end2, bulge2 = p2
 
             if bulge1 == 0.0000:
-                length += math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+                length += distance_2d((x1, y1), (x2, y2))
             else:
                 length += get_arc_length(p1, p2)
     return length
