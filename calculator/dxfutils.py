@@ -11,6 +11,14 @@ DXF_TYPE_CIRCLE = 'CIRCLE'
 DXF_TYPE_TEXT = 'TEXT'
 
 
+def distance_2d(p1, p2):
+    x1, y1 = p1
+    x2, y2 = p2
+    distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
+
+    return distance
+
+
 def get_arc_length(p1, p2):
     """
     Helper function to compute the arc length between two points.
@@ -18,12 +26,41 @@ def get_arc_length(p1, p2):
     x1, y1, start1, end1, bulge1 = p1
     x2, y2, start2, end2, bulge2 = p2
 
-    # Formula: https://www.liutaiomottola.com/formulae/sag.htm
-    l = (x2-x1) * 0.5
-    s = l * bulge1
+    reverse = False
+    bulge = abs(bulge1)
+
+    # If bulge is greater 1.0, the angle is greater 180 degrees.
+    # We consider the case 360 - angle and reverse in the end.
+    if bulge > 1.0:
+        bulge = bulge - int(bulge) # only take digits after float point
+        reverse = True
+
+    # l is half the base side of the triangle
+    l = 0.5 * distance_2d((x1, y1), (x2, y2))
+
+    # s is the sagita: the distance between the base side of the triangle
+    # and the circle. The bulge value can be negative, denoting the side
+    # of the curve. Not important for its length.
+    s = l * bulge
+
+    # compute the circle's radius
     r = ((s*s) + (l*l)) / (2*s)
-    alpha = 2 * math.asin(l/r)
-    arc_length = abs(alpha * r)
+
+    # height of the triangle
+    h = r - s
+
+    if h == 0.0:
+        # edge case: half circle leads to h = 0
+        alpha = math.pi
+    else:
+        # angle in the triangle in the middle of the circle
+        alpha = 2 * math.atan(l/h)
+
+    # arc length as part of the entire circumference of the circle
+    arc_length = alpha * r
+
+    if reverse:
+        arc_length = 2*r*math.pi - arc_length
 
     return arc_length
 

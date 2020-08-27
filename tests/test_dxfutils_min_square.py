@@ -1,5 +1,5 @@
 import pytest
-from calculator.dxfutils import *
+from calculator.dxfutils import get_dxf_model_space, get_min_square
 
 
 def test_get_min_square_square():
