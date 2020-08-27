@@ -1,6 +1,6 @@
 import openpyxl
 import argparse
-from calculator.costfunctions import compute_cost
+from calculator import costfunction
 from collections import namedtuple
 
 
@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
             row_index += 1
             file_path = dxf_files_path + 'Test2.dxf' #ZeichnungsNr.value
-            cost = compute_cost(
+            cost = costfunction.compute_cost(
                 Liefermenge.value,
                 file_path,
                 Dicke.value,

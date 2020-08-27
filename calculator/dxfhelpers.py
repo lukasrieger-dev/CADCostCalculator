@@ -1,9 +1,14 @@
-import ezdxf
-import math
 import sys
-
+import math
+import ezdxf
 
 __author__ = 'lukas'
+
+
+# dxf constants
+DXF_TYPE_LWPOLYLINE = 'LWPOLYLINE'
+DXF_TYPE_CIRCLE = 'CIRCLE'
+DXF_TYPE_TEXT = 'TEXT'
 
 
 def get_arc_length(p1, p2):
@@ -54,15 +59,16 @@ def get_edge_sum(msp):
     """
     total_length = 0
     for e in msp:
-        if e.dxftype() == 'LWPOLYLINE':
+        dxftype = e.dxftype()
+        if dxftype == DXF_TYPE_LWPOLYLINE:
             total_length += get_polyline_length(e)
 
-        elif e.dxftype() == 'CIRCLE':
+        elif dxftype == DXF_TYPE_CIRCLE:
             circumference = 2 * e.dxf.radius * math.pi
             total_length += circumference
 
         else:
-            print(f'Fehler: Unbekanntes CAD Element: {e.dxftype()}')
+            print(f'Fehler: Unbekanntes CAD Element: {dxftype}')
             sys.exit(1)
 
     return round(total_length, 3)
@@ -72,13 +78,16 @@ def get_min_square(msp, offset=5):
     """
     Return the size of the minimal square around this drawing.
     """
-    min_x = float('inf')
-    max_x = float('-inf')
-    min_y = float('inf')
-    max_y = float('-inf')
+    if offset < 0:
+        print('Negativer Offset ist nicht erlaubt! Setze Offset = 0')
+        offset = 0
+
+    min_x = float('inf'); max_x = float('-inf')
+    min_y = float('inf'); max_y = float('-inf')
 
     for e in msp:
-        if e.dxftype() == 'LWPOLYLINE':
+        dxftype = e.dxftype()
+        if dxftype == DXF_TYPE_LWPOLYLINE:
             with e.points('xyseb') as points:
                 for point in points:
                     x, y, *_ = point
@@ -87,10 +96,30 @@ def get_min_square(msp, offset=5):
                     min_y = min(min_y, y)
                     max_y = max(max_y, y)
 
+        elif dxftype == DXF_TYPE_CIRCLE:
+            radius = e.dxf.radius
+            center = e.dxf.center
+
+            min_x = min(min_x, center[0] - radius)
+            max_x = max(max_x, center[0] + radius)
+            min_y = min(min_y, center[1] - radius)
+            max_y = max(max_y, center[1] + radius)
+
+        elif dxftype == DXF_TYPE_TEXT:
+            pass
+
+        else:
+            raise ValueError(f'Unknown dxftype {dxftype}!')
+
     a = max_x - min_x + 2*offset
     b = max_y - min_y + 2*offset
 
     return a, b, round(a * b, 3)
+
+
+def get_dxf_model_space(path):
+    document = ezdxf.readfile(path)
+    return document.modelspace()
 
 
 def process_dxf_file(path):
@@ -98,56 +127,18 @@ def process_dxf_file(path):
     Compute total edge length and minimal square of a given drawing.
     """
     try:
-        doc = ezdxf.readfile(path)
-        model_space = doc.modelspace()
+        model_space = get_dxf_model_space(path)
         total_edge_length = get_edge_sum(model_space)
         print(f'Kantenlänge = {round(total_edge_length / 10, 2)}cm')
 
         # min_square is a tuple! (length a, length b, area)
         min_square = get_min_square(model_space)
         print(f'Kleinstes Rechteck: a = {round(min_square[0] / 10, 2)}cm, b = {round(min_square[1] / 10, 2)}cm, Fläche = {round(min_square[2] / 100, 2)}cm2')
+    except FileNotFoundError:
+        print(f'Die Datei {path} konnte nicht gefunden werden')
     except Exception as e:
         print(f'Fehler beim Verarbeiten von {path} -> {e}')
         sys.exit(1)
 
     area_mm2 = min_square[2]
     return total_edge_length, area_mm2
-
-
-def compute_part_weight(min_square, height, weight_g_cm3):
-    """
-    Compute the weight in gramme of the given part size and height depending
-    on the grammes weight per volume.
-    """
-    # mm2 * mm -> mm3 -> /1000 -> cm3
-    volume_cm3 = min_square * height / 1000
-    weight_g = volume_cm3 * weight_g_cm3
-
-    return weight_g
-
-
-def compute_cost(amount, file_path, height, speed, cut_speed_price_min, weight_g_cm3, material_cost_per_t, margin):
-    """
-    Compute the cost of this position as given in this dxf file.
-    A position is a part and the amount of this part.
-    The cost formula is: cost = amount * margin * (material cost + time cost)
-    """
-    total_edge_length, min_square = process_dxf_file(file_path)
-
-    # material cost
-    part_weight_g = compute_part_weight(min_square, height, weight_g_cm3)
-    print(f'Gewicht/Teil: {round(part_weight_g/1000, 2)}kg')
-
-    cost_per_g = material_cost_per_t / (1000 * 1000)
-    # cost in Euro per g
-    material_cost = part_weight_g * cost_per_g
-    print(f'Materialkosten/Teil: {round(material_cost, 2)}€')
-
-    # work time cost
-    work_time_s = total_edge_length / speed
-    time_cost = work_time_s * cut_speed_price_min / 60
-    print(f'Zeitkosten/Teil: {round(time_cost, 2)}€')
-
-    cost = amount * margin * (material_cost + time_cost)
-
-    return cost
