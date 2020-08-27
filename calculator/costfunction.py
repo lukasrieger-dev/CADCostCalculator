@@ -1,18 +1,8 @@
-from calculator import dxfhelpers
+from calculator import dxfutils
+from calculator.utils import *
 
 __author__ = 'lukas'
 
-
-def compute_part_weight(min_square, height, weight_g_cm3):
-    """
-    Compute the weight in gramme of the given part size and height depending
-    on the grammes weight per volume.
-    """
-    # mm2 * mm -> mm3 -> /1000 -> cm3
-    volume_cm3 = min_square * height / 1000
-    weight_g = volume_cm3 * weight_g_cm3
-
-    return weight_g
 
 
 def compute_cost(amount, file_path, height, speed, cut_speed_price_min, weight_g_cm3, material_cost_per_t, margin):
@@ -21,7 +11,7 @@ def compute_cost(amount, file_path, height, speed, cut_speed_price_min, weight_g
     A position is a part and the amount of this part.
     The cost formula is: cost = amount * margin * (material cost + time cost)
     """
-    total_edge_length, min_square = dxfhelpers.process_dxf_file(file_path)
+    total_edge_length, min_square = dxfutils.process_dxf_file(file_path)
 
     # material cost
     part_weight_g = compute_part_weight(min_square, height, weight_g_cm3)

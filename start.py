@@ -38,7 +38,7 @@ def is_number(string):
         return False
 
 
-if __name__ == '__main__':
+def run():
     Configuration = namedtuple('Configuration', (
         'offset', 'material_cost_per_t', 'Schnittgeschwindigkeit_mm_s',
         'Kosten_Schnitt_euro_min', 'Materialgewicht_g_cm3', 'Materialkosten_euro_t',
@@ -72,8 +72,8 @@ if __name__ == '__main__':
         configuration = Configuration(**load_from_init_file(args.init_file))
 
     # set correct default values in else-branch or remove if _ else _
-    excel_file_path = args.excel_file if args.excel_file else './docs/Excel.xlsx'
-    dxf_files_path = args.dxf_path if args.dxf_path else './docs/'
+    excel_file_path = args.excel_file if args.excel_file else '../docs/Excel.xlsx'
+    dxf_files_path = args.dxf_path if args.dxf_path else '../docs/'
 
     try:
         xlsx = openpyxl.load_workbook(excel_file_path)
@@ -81,6 +81,7 @@ if __name__ == '__main__':
         values = sheet[str(sheet.dimensions)]
         is_header = True
         row_index = 1
+        sum_of_all_cost = 0
 
         cell = configuration.Ausgabespalte + str(row_index)
         sheet[cell] = 'Kosten in €'
@@ -105,12 +106,15 @@ if __name__ == '__main__':
                 configuration.Gewinnmarge
             )
 
+            sum_of_all_cost += cost
             cell = configuration.Ausgabespalte + str(row_index)
             sheet[cell] = format(cost, '.2f')
             print(f'Kosten für {Liefermenge.value} x {Benennung.value}: {round(cost, 2)}€')
             print("==============================================================")
 
-        xlsx.save('./docs/output.xlsx')
+        xlsx.save('../docs/output.xlsx')
+        return sum_of_all_cost
+
     except Exception as e:
         print(f'Fehler -> {e}')
 

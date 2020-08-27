@@ -1,5 +1,5 @@
 import pytest
-from calculator.dxfhelpers import *
+from calculator.dxfutils import *
 
 
 def test_get_dxf_modelspace():
