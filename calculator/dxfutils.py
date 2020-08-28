@@ -9,6 +9,10 @@ __author__ = 'lukas'
 DXF_TYPE_LWPOLYLINE = 'LWPOLYLINE'
 DXF_TYPE_CIRCLE = 'CIRCLE'
 DXF_TYPE_TEXT = 'TEXT'
+DXF_TYPE_MTEXT = 'MTEXT'
+DXF_TYPE_LINE = 'LINE'
+DXF_TYPE_ARC = 'ARC'
+DXF_TYPE_INSERT = 'INSERT'
 
 
 def distance_2d(p1, p2):
@@ -17,6 +21,12 @@ def distance_2d(p1, p2):
     distance = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
 
     return distance
+
+
+def get_arc_length_simple(radius, angle):
+    arc_length = 2*math.pi*radius * angle/360
+
+    return arc_length
 
 
 def get_arc_length(p1, p2):
@@ -104,6 +114,18 @@ def get_edge_sum(msp):
             circumference = 2 * e.dxf.radius * math.pi
             total_length += circumference
 
+        elif dxftype == DXF_TYPE_ARC:
+            radius = e.dxf.end_angle - e.dxf.start_angle
+            total_length += get_arc_length_simple(e.dxf.radius, radius)
+
+        elif dxftype == DXF_TYPE_LINE:
+            x1, y1, _ = e.dxf.start
+            x2, y2, _ = e.dxf.end
+            total_length += distance_2d((x1, y1), (x2, y2))
+
+        elif dxftype in {DXF_TYPE_TEXT, DXF_TYPE_INSERT, DXF_TYPE_MTEXT}:
+            continue
+
         else:
             print(f'Fehler: Unbekanntes CAD Element: {dxftype}')
             sys.exit(1)
@@ -142,8 +164,25 @@ def get_min_square(msp, offset=5):
             min_y = min(min_y, center[1] - radius)
             max_y = max(max_y, center[1] + radius)
 
-        elif dxftype == DXF_TYPE_TEXT:
+        elif dxftype == DXF_TYPE_LINE:
+            x1, y1, _ = e.dxf.start
+            x2, y2, _ = e.dxf.end
+
+            min_x = min(min_x, x1)
+            max_x = max(max_x, x1)
+            min_y = min(min_y, y1)
+            max_y = max(max_y, y1)
+            min_x = min(min_x, x2)
+            max_x = max(max_x, x2)
+            min_y = min(min_y, y2)
+            max_y = max(max_y, y2)
+
+        elif dxftype == DXF_TYPE_ARC:
+            # TODO: process arc
             pass
+
+        elif dxftype in {DXF_TYPE_TEXT, DXF_TYPE_INSERT, DXF_TYPE_MTEXT}:
+            continue
 
         else:
             raise ValueError(f'Unknown dxftype {dxftype}!')
@@ -175,7 +214,7 @@ def process_dxf_file(path):
         print(f'Die Datei {path} konnte nicht gefunden werden')
     except Exception as e:
         print(f'Fehler beim Verarbeiten von {path} -> {e}')
-        sys.exit(1)
+        raise e
 
     area_mm2 = min_square[2]
     return total_edge_length, area_mm2

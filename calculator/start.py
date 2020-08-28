@@ -94,7 +94,7 @@ def run():
                 continue
 
             row_index += 1
-            file_path = dxf_files_path + 'Test2.dxf' #ZeichnungsNr.value
+            file_path = dxf_files_path + 'UM00056770-20mm-S235JR.dxf' #'Test2.dxf' #ZeichnungsNr.value
             cost = costfunction.compute_cost(
                 Liefermenge.value,
                 file_path,
@@ -117,5 +117,6 @@ def run():
 
     except Exception as e:
         print(f'Fehler -> {e}')
+        raise e
 
 
