@@ -122,5 +122,10 @@ if __name__ == '__main__':
     print('#     GEO to DXF Converter    #')
     input_file = input('Enter input file path:')
     output_file_name = input('Enter output name')
-    to_dxf_file(input_file, output_file_name)
-    print('Your dxf file was created.')
+    
+    try:
+        to_dxf_file(input_file, output_file_name)
+        print('Your dxf file was created.')
+    except Exception as e:
+        print(f'ERROR: {e}')
+
