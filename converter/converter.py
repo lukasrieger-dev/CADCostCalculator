@@ -123,3 +123,4 @@ if __name__ == '__main__':
     input_file = input('Enter input file path:')
     output_file_name = input('Enter output name')
     to_dxf_file(input_file, output_file_name)
+    print('Your dxf file was created.')
