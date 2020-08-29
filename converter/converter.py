@@ -119,4 +119,7 @@ def to_dxf_file(geo_file_path, output_file_path):
 
 
 if __name__ == '__main__':
-    to_dxf_file('../docs/UM00056770-20mm-S235JR.GEO', '../docs/conversion_result.dxf')
+    print('#     GEO to DXF Converter    #')
+    input_file = input('Enter input file path:')
+    output_file_name = input('Enter output name')
+    to_dxf_file(input_file, output_file_name)
