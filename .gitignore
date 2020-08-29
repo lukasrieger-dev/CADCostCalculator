@@ -7,10 +7,8 @@ __pycache__/
 *.so
 
 # CAD and laser files
-*.DXF
-*.dxf
-*.GEO
-*.geo
+**/*.DXF
+**/*.GEO
 
 # Distribution / packaging
 .Python
