@@ -8,7 +8,9 @@ __pycache__/
 
 # CAD and laser files
 *.DXF
+*.dxf
 *.GEO
+*.geo
 
 # Distribution / packaging
 .Python
