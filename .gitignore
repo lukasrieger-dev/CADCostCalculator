@@ -6,6 +6,10 @@ __pycache__/
 # C extensions
 *.so
 
+# CAD and laser files
+*.DXF
+*.GEO
+
 # Distribution / packaging
 .Python
 build/
