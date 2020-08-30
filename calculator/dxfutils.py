@@ -1,6 +1,7 @@
 import sys
 import math
 import ezdxf
+import logging
 
 __author__ = 'lukas'
 
@@ -205,11 +206,11 @@ def process_dxf_file(path):
     try:
         model_space = get_dxf_model_space(path)
         total_edge_length = get_edge_sum(model_space)
-        print(f'Kantenlänge = {round(total_edge_length / 10, 2)}cm')
+        logging.debug(f'Kantenlänge = {round(total_edge_length / 10, 2)}cm')
 
         # min_square is a tuple! (length a, length b, area)
         min_square = get_min_square(model_space)
-        print(f'Kleinstes Rechteck: a = {round(min_square[0] / 10, 2)}cm, b = {round(min_square[1] / 10, 2)}cm, Fläche = {round(min_square[2] / 100, 2)}cm2')
+        logging.debug(f'Kleinstes Rechteck: a = {round(min_square[0] / 10, 2)}cm, b = {round(min_square[1] / 10, 2)}cm, Fläche = {round(min_square[2] / 100, 2)}cm2')
     except FileNotFoundError:
         print(f'Die Datei {path} konnte nicht gefunden werden')
     except Exception as e:
