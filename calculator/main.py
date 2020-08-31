@@ -1,7 +1,5 @@
 import openpyxl
 import logging
-import time
-from shutil import copyfile
 from calculator import costfunction
 from converter.converter import to_dxf_file
 from collections import namedtuple
