@@ -1,4 +1,6 @@
 import tkinter as tk
+from tkinter import messagebox
+import string
 
 
 class ParametersPanel:
@@ -66,26 +68,80 @@ class ParametersPanel:
         self.entry_std_dicke_mm = tk.Entry(parameters_frame, textvariable=parent.std_dicke_mm, font=parent.app_font, width=entry_width)
         self.entry_std_dicke_mm.grid(row=3, column=5, sticky='W')
 
-    def is_number(self, string):
-        try:
-            float(string)
-            return True
-        except:
-            return False
-
     def update_parameters(self):
-        # TODO: check number/string -> don't process invalid inputs
-        self.parent.parameters['Offset'] = float(self.entry_offset.get())
-        self.parent.parameters['Materialkosten_euro_t'] = float(self.entry_material_cost.get())
-        self.parent.parameters['Schnittgeschwindigkeit_mm_s'] = float(self.entry_schnittgeschwindigkeit_mm_s.get())
-        self.parent.parameters['Kosten_Schnitt_euro_min'] = float(self.entry_kosten_schnitt_euro_min.get())
-        self.parent.parameters['Materialgewicht_g_cm3'] = float(self.entry_materialgewicht_g_cm3.get())
-        self.parent.parameters['Gewinnmarge'] = float(self.entry_gewinnmarge.get())
-        self.parent.parameters['Ausgabespalte'] = self.entry_excel_ausgabespalte.get()
-        self.parent.parameters['Nr_erste_Reihe_Daten'] = int(self.entry_excel_first_row.get())
+        def is_number(string):
+            try:
+                float(string)
+                return True
+            except:
+                return False
+
+        msg = 'Bitte korrigiere folgende Eingaben: '
+        error = False
+
+        value = self.entry_offset.get()
+        if is_number(value):
+            self.parent.parameters['Offset'] = float(value)
+        else:
+            msg += '\nOffset'
+            error = True
+
+        value = self.entry_material_cost.get()
+        if is_number(value):
+            self.parent.parameters['Materialkosten_euro_t'] = float(value)
+        else:
+            msg += '\nMaterialkosten'
+            error = True
+
+        value = self.entry_schnittgeschwindigkeit_mm_s.get()
+        if is_number(value):
+            self.parent.parameters['Schnittgeschwindigkeit_mm_s'] = float(value)
+        else:
+            msg += '\nSchnittgeschwindigkeit'
+            error = True
+
+        value = self.entry_kosten_schnitt_euro_min.get()
+        if is_number(value):
+            self.parent.parameters['Kosten_Schnitt_euro_min'] = float(value)
+        else:
+            msg += '\nSchnittkosten'
+            error = True
+
+        value = self.entry_materialgewicht_g_cm3.get()
+        if is_number(value):
+            self.parent.parameters['Materialgewicht_g_cm3'] = float(value)
+        else:
+            msg += '\nMaterialgewicht'
+            error = True
+
+        value = self.entry_gewinnmarge.get()
+        if is_number(value):
+            self.parent.parameters['Gewinnmarge'] = float(value)
+        else:
+            msg += '\nGewinnmarge'
+            error = True
+
+        value = self.entry_excel_ausgabespalte.get()
+        if value in string.ascii_uppercase:
+            self.parent.parameters['Ausgabespalte'] = value
+        else:
+            msg += '\nAusgabespalte'
+            error = True
+
+        value = self.entry_excel_first_row.get()
+        if is_number(value) and int(value) > 0:
+            self.parent.parameters['Nr_erste_Reihe_Daten'] = int(value)
+        else:
+            msg += '\nErste Zeile in Excel'
+            error = True
 
         value = self.entry_std_dicke_mm.get()
-        if self.is_number(value):
+        if is_number(value):
             self.parent.parameters['Std_Dicke_mm'] = float(value)
         else:
             self.parent.parameters['Std_Dicke_mm'] = value
+
+        if error:
+            messagebox.showerror("Fehlerhafte Eingaben", msg)
+
+        return error

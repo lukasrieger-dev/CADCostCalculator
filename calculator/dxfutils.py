@@ -179,9 +179,17 @@ def get_min_square(msp, offset=5):
             max_y = max(max_y, y2)
 
         elif dxftype == DXF_TYPE_ARC:
-            # TODO: process arc
-            print('TODO: PROCESS ARC')
-            pass
+            x1, y1, *_ = e.start_point
+            x2, y2, *_ = e.end_point
+
+            min_x = min(min_x, x1)
+            max_x = max(max_x, x1)
+            min_y = min(min_y, y1)
+            max_y = max(max_y, y1)
+            min_x = min(min_x, x2)
+            max_x = max(max_x, x2)
+            min_y = min(min_y, y2)
+            max_y = max(max_y, y2)
 
         elif dxftype in {DXF_TYPE_TEXT, DXF_TYPE_INSERT, DXF_TYPE_MTEXT}:
             continue

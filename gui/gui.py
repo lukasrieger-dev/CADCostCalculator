@@ -136,7 +136,10 @@ class ApplicationGUI(tk.Frame):
         self.excel_path.set(filename)
 
     def calculate(self):
-        self.parameters_panel.update_parameters()
+        error = self.parameters_panel.update_parameters()
+        if error:
+            return
+        
         selected = self.use_excel.get()
 
         if selected:
