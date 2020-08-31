@@ -122,7 +122,7 @@ class ParametersPanel:
             error = True
 
         value = self.entry_excel_ausgabespalte.get()
-        if value in string.ascii_uppercase:
+        if value in string.ascii_uppercase or value in string.ascii_lowercase:
             self.parent.parameters['Ausgabespalte'] = value
         else:
             msg += '\nAusgabespalte'

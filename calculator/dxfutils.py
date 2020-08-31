@@ -212,20 +212,13 @@ def process_dxf_file(path, offset):
     """
     Compute total edge length and minimal square of a given drawing.
     """
-    try:
-        model_space = get_dxf_model_space(path)
-        total_edge_length = get_edge_sum(model_space)
-        logging.debug(f'Kantenlänge = {round(total_edge_length / 10, 2)}cm')
+    model_space = get_dxf_model_space(path)
+    total_edge_length = get_edge_sum(model_space)
+    logging.debug(f'Kantenlänge = {round(total_edge_length / 10, 2)}cm')
 
-        # min_square is a tuple! (length a, length b, area)
-        min_square = get_min_square(model_space, offset)
-        logging.debug(f'Kleinstes Rechteck: a = {round(min_square[0] / 10, 2)}cm, b = {round(min_square[1] / 10, 2)}cm, Fläche = {round(min_square[2] / 100, 2)}cm2')
-    except FileNotFoundError:
-        print(f'Die Datei {path} konnte nicht gefunden werden')
-        min_square = 0, 0, 0
-    except Exception as e:
-        print(f'Fehler beim Verarbeiten von {path} -> {e}')
-        raise e
+    # min_square is a tuple! (length a, length b, area)
+    min_square = get_min_square(model_space, offset)
+    logging.debug(f'Kleinstes Rechteck: a = {round(min_square[0] / 10, 2)}cm, b = {round(min_square[1] / 10, 2)}cm, Fläche = {round(min_square[2] / 100, 2)}cm2')
 
     area_mm2 = min_square[2]
     return total_edge_length, area_mm2

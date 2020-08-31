@@ -8,12 +8,9 @@ class CustomButton(tk.Button):
         self.bind("<Leave>", self.on_leave)
 
     def on_enter(self, e):
-        self.config(bg='green')
-        self.grid()
-        self.update_idletasks()
+        self['bg'] = 'green'
         print('On_Enter')
 
     def on_leave(self, e):
-        self.configure(bg='white')
-        self.grid()
+        self['bg'] = 'grey'
         print('On_Leave')

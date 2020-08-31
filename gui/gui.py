@@ -1,5 +1,5 @@
 import tkinter as tk
-import tkinter.filedialog
+from tkinter import filedialog, messagebox
 import calculator.main
 from converter.converter import to_dxf_file
 from gui.custom_button import CustomButton
@@ -91,7 +91,7 @@ class ApplicationGUI(tk.Frame):
         self.entry_excel_path.focus()
         self.entry_excel_path.grid(row=1, column=0, sticky='W')
 
-        self.button_open_filedialog_excel = CustomButton(self, text='Durchsuchen', command=self.open_filedialog_excel, bg='grey', fg='black', font=self.app_font)
+        self.button_open_filedialog_excel = tk.Button(self, text='Durchsuchen', command=self.open_filedialog_excel, bg='grey', fg='black', activebackground='azure3', font=self.app_font)
         self.button_open_filedialog_excel.grid(row=1, column=0, sticky='E')
 
         # Drawings path input
@@ -101,7 +101,7 @@ class ApplicationGUI(tk.Frame):
         self.entry_drawings_path = tk.Entry(self, width=65, textvariable=self.drawings_path)
         self.entry_drawings_path.grid(row=3, column=0, sticky='W')
 
-        self.button_open_filedialog_drawings = tk.Button(self, text='Durchsuchen', command=self.open_filedialog_drawings, bg='grey', fg='black', font=self.app_font)
+        self.button_open_filedialog_drawings = tk.Button(self, text='Durchsuchen', command=self.open_filedialog_drawings, bg='grey', fg='black', activebackground='azure3', font=self.app_font)
         self.button_open_filedialog_drawings.grid(row=3, column=0, sticky='E')
 
         self.parameters_panel = ParametersPanel(self)
@@ -111,10 +111,10 @@ class ApplicationGUI(tk.Frame):
         self.buttons_frame.grid(row=7, column=0, pady=(10, 10))
         self.buttons_frame.columnconfigure(1, weight=1)
 
-        self.button_close = tk.Button(self.buttons_frame, text='Beenden', command=self.close, bg='grey', fg='black', font=self.app_font)
+        self.button_close = tk.Button(self.buttons_frame, text='Beenden', command=self.close, bg='grey', fg='black', activebackground='azure3', font=self.app_font)
         self.button_close.grid(row=0, column=0, padx=(10, 10))
 
-        self.button_compute = tk.Button(self.buttons_frame, text='Berechnen', command=self.calculate, bg='grey', fg='black', font=self.app_font)
+        self.button_compute = tk.Button(self.buttons_frame, text='Berechnen', command=self.calculate, bg='grey', fg='black', activebackground='azure3', font=self.app_font)
         self.button_compute.grid(row=0, column=2, padx=(10, 10))
 
         #
@@ -139,25 +139,28 @@ class ApplicationGUI(tk.Frame):
         error = self.parameters_panel.update_parameters()
         if error:
             return
-        
+
         selected = self.use_excel.get()
 
-        if selected:
-            result = calculator.main.calculate(self.parameters, self.drawings_path.get(), self.excel_path.get())
-        else:
-            path = self.drawings_path.get()
-            _, ending = path.split('.')
+        try:
+            if selected:
+                result = calculator.main.calculate(self.parameters, self.drawings_path.get(), self.excel_path.get())
+            else:
+                path = self.drawings_path.get()
+                _, ending = path.split('.')
 
-            if ending.upper() == 'GEO':
-                tmp_path = './tmp.DXF'
-                to_dxf_file(path, tmp_path)
-                path = tmp_path
+                if ending.upper() == 'GEO':
+                    tmp_path = './tmp.DXF'
+                    to_dxf_file(path, tmp_path)
+                    path = tmp_path
 
-            result = calculator.main.calculate(self.parameters, path)
+                result = calculator.main.calculate(self.parameters, path)
 
-        cost = format(result, '.2f') + '€'
-        msg = f'Berechnete Gesamtkosten: {cost}'
-        self.cost_result.set(msg)
+            cost = format(result, '.2f') + '€'
+            msg = f'Berechnete Gesamtkosten: {cost}'
+            self.cost_result.set(msg)
+        except Exception as e:
+            messagebox.showerror('Berechnung abgebrochen!', f'Ein Fehler ist aufgetreten: {e}')
 
     def eval_checkbox(self):
         selected = self.use_excel.get()
