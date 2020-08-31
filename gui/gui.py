@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog, messagebox
 import calculator.main
-from converter.converter import to_dxf_file
-from gui.custom_button import CustomButton
 from gui.parameters_panel import ParametersPanel
 
 
@@ -128,7 +126,7 @@ class ApplicationGUI(tk.Frame):
             filename = tk.filedialog.askdirectory(initialdir="/", title="Verzeichnis auswählen")
             self.drawings_path.set(filename)
         else:
-            filename = tk.filedialog.askopenfilename(initialdir="/", title="Datei auswählen", filetypes=(("DXF Dateien", "*.DXF"), ("GEO Dateien", "*.GEO")))
+            filename = tk.filedialog.askopenfilename(initialdir="/", title="Datei auswählen", filetypes=(("Alle Dateien", "*"),))
             self.drawings_path.set(filename)
 
     def open_filedialog_excel(self):
@@ -146,15 +144,7 @@ class ApplicationGUI(tk.Frame):
             if selected:
                 result = calculator.main.calculate(self.parameters, self.drawings_path.get(), self.excel_path.get())
             else:
-                path = self.drawings_path.get()
-                _, ending = path.split('.')
-
-                if ending.upper() == 'GEO':
-                    tmp_path = './tmp.DXF'
-                    to_dxf_file(path, tmp_path)
-                    path = tmp_path
-
-                result = calculator.main.calculate(self.parameters, path)
+                result = calculator.main.calculate(self.parameters, self.drawings_path.get())
 
             cost = format(result, '.2f') + '€'
             msg = f'Berechnete Gesamtkosten: {cost}'

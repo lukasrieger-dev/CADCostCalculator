@@ -1,6 +1,9 @@
 import openpyxl
 import logging
+import time
+from shutil import copyfile
 from calculator import costfunction
+from converter.converter import to_dxf_file
 from collections import namedtuple
 
 
@@ -16,9 +19,16 @@ Configuration.__new__.__defaults__ = (0.0,) * len(Configuration._fields)
 
 
 def calculate(parameters, drawings_path, excel_file_path=None):
+    tmp_file_path = './tmp.DXF'
     configuration = Configuration(**parameters)
 
     if not excel_file_path:
+        try:
+            to_dxf_file(drawings_path, './tmp.DXF')
+            drawings_path = './tmp.DXF'
+        except:
+            pass
+
         return costfunction.compute_cost(
             1,
             drawings_path,
@@ -48,9 +58,15 @@ def calculate(parameters, drawings_path, excel_file_path=None):
             for LfdNr, Liefermenge, ZeichnungsNr, Benennung, Dicke, Material in values:
                 row_index += 1
                 file_path = drawings_path + '/' + ZeichnungsNr.value
+                try:
+                    to_dxf_file(file_path, tmp_file_path)
+                except:
+                    # file is already .dxf
+                    pass
+
                 cost = costfunction.compute_cost(
                     Liefermenge.value,
-                    file_path,
+                    tmp_file_path,
                     Dicke.value,
                     configuration.Schnittgeschwindigkeit_mm_s,
                     configuration.Kosten_Schnitt_euro_min,
