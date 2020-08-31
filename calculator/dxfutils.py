@@ -180,6 +180,7 @@ def get_min_square(msp, offset=5):
 
         elif dxftype == DXF_TYPE_ARC:
             # TODO: process arc
+            print('TODO: PROCESS ARC')
             pass
 
         elif dxftype in {DXF_TYPE_TEXT, DXF_TYPE_INSERT, DXF_TYPE_MTEXT}:
@@ -199,7 +200,7 @@ def get_dxf_model_space(path):
     return document.modelspace()
 
 
-def process_dxf_file(path):
+def process_dxf_file(path, offset):
     """
     Compute total edge length and minimal square of a given drawing.
     """
@@ -209,10 +210,11 @@ def process_dxf_file(path):
         logging.debug(f'Kantenlänge = {round(total_edge_length / 10, 2)}cm')
 
         # min_square is a tuple! (length a, length b, area)
-        min_square = get_min_square(model_space)
+        min_square = get_min_square(model_space, offset)
         logging.debug(f'Kleinstes Rechteck: a = {round(min_square[0] / 10, 2)}cm, b = {round(min_square[1] / 10, 2)}cm, Fläche = {round(min_square[2] / 100, 2)}cm2')
     except FileNotFoundError:
         print(f'Die Datei {path} konnte nicht gefunden werden')
+        min_square = 0, 0, 0
     except Exception as e:
         print(f'Fehler beim Verarbeiten von {path} -> {e}')
         raise e
