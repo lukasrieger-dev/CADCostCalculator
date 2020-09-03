@@ -1,4 +1,3 @@
-import sys
 import math
 import ezdxf
 import logging
@@ -128,7 +127,7 @@ def get_edge_sum(msp):
             continue
 
         else:
-            logging.WARNING(f'Fehler -> {dxftype} is unknown.')
+            logging.error(f'Fehler -> {dxftype} is unknown.')
             raise ValueError(f'Fehler: Unbekanntes CAD Element: {dxftype}')
 
     return round(total_length, 3)
@@ -181,8 +180,11 @@ def get_min_square(msp, offset=5):
             continue
 
         else:
-            logging.WARNING(f'Fehler -> {dxftype} is unknown.')
+            logging.error(f'Fehler -> {dxftype} is unknown.')
             raise ValueError(f'Fehler: Unbekanntes CAD Element: {dxftype}')
+
+    if not all_points:
+        raise ValueError('Die/eine angegebene Zeichnung ist leer/fehlerhaft.')
 
     min_x = min(all_points, key=lambda p: p[0])[0]
     min_y = min(all_points, key=lambda p: p[1])[1]
@@ -196,6 +198,9 @@ def get_min_square(msp, offset=5):
 
 
 def get_dxf_model_space(path):
+    """
+    Return the DXF file's model space.
+    """
     document = ezdxf.readfile(path)
     return document.modelspace()
 

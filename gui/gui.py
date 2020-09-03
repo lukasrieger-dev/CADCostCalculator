@@ -145,13 +145,17 @@ class ApplicationGUI(tk.Frame):
             if selected:
                 result = calculator.main.calculate(self.parameters, self.drawings_path.get(), self.excel_path.get())
             else:
+                try:
+                    float(self.std_dicke_mm.get())
+                except ValueError:
+                    raise ValueError('Bitte eine Zahl für die Dicke in mm eingeben.')
                 result = calculator.main.calculate(self.parameters, self.drawings_path.get())
 
             cost = format(result, '.2f') + '€'
             msg = f'Berechnete Gesamtkosten: {cost}'
             self.cost_result.set(msg)
         except Exception as e:
-            logging.WARNING(f'Exception in GUI.calculate(): {e}')
+            logging.error(e)
             messagebox.showerror('Berechnung abgebrochen!', f'Ein Fehler ist aufgetreten: {e}')
 
     def eval_checkbox(self):

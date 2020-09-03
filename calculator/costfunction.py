@@ -5,7 +5,6 @@ import logging
 __author__ = 'lukas'
 
 
-
 def compute_cost(amount, file_path, height, speed, cut_speed_price_min, weight_g_cm3, material_cost_per_t, marge, offset):
     """
     Compute the cost of this position as given in this dxf file.
