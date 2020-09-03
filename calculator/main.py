@@ -2,23 +2,15 @@ import openpyxl
 import logging
 from calculator import costfunction
 from converter.converter import to_dxf_file
-from collections import namedtuple
+from calculator import config
 
 
 __author__ = 'lukas'
 
-# TODO: global config dict/tuple
-Configuration = namedtuple('Configuration', (
-    'Offset', 'Schnittgeschwindigkeit_mm_s',
-    'Kosten_Schnitt_euro_min', 'Materialgewicht_g_cm3', 'Materialkosten_euro_t',
-    'Gewinnmarge', 'Ausgabespalte', 'Nr_erste_Reihe_Daten', 'Std_Dicke_mm'
-))
-Configuration.__new__.__defaults__ = (0.0,) * len(Configuration._fields)
-
 
 def calculate(parameters, drawings_path, excel_file_path=None):
     tmp_file_path = './tmp.DXF'
-    configuration = Configuration(**parameters)
+    configuration = config.Configuration(**parameters)
 
     if not excel_file_path:
         try:
@@ -85,7 +77,7 @@ def calculate(parameters, drawings_path, excel_file_path=None):
             return sum_of_all_cost
 
         except Exception as e:
-            print(f'Fehler -> {e}')
+            logging.WARNING(f'Fehler -> {e}')
             raise e
 
 

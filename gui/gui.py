@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import calculator.main
 from gui.parameters_panel import ParametersPanel
+import logging
 
 
 class ApplicationGUI(tk.Frame):
@@ -150,6 +151,7 @@ class ApplicationGUI(tk.Frame):
             msg = f'Berechnete Gesamtkosten: {cost}'
             self.cost_result.set(msg)
         except Exception as e:
+            logging.WARNING(f'Exception in GUI.calculate(): {e}')
             messagebox.showerror('Berechnung abgebrochen!', f'Ein Fehler ist aufgetreten: {e}')
 
     def eval_checkbox(self):

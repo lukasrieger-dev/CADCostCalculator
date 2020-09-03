@@ -128,8 +128,8 @@ def get_edge_sum(msp):
             continue
 
         else:
-            print(f'Fehler: Unbekanntes CAD Element: {dxftype}')
-            sys.exit(1)
+            logging.WARNING(f'Fehler -> {dxftype} is unknown.')
+            raise ValueError(f'Fehler: Unbekanntes CAD Element: {dxftype}')
 
     return round(total_length, 3)
 
@@ -142,8 +142,7 @@ def get_min_square(msp, offset=5):
         print('Negativer Offset ist nicht erlaubt! Setze Offset = 0')
         offset = 0
 
-    min_x = float('inf'); max_x = float('-inf')
-    min_y = float('inf'); max_y = float('-inf')
+    all_points = []
 
     for e in msp:
         dxftype = e.dxftype()
@@ -151,51 +150,44 @@ def get_min_square(msp, offset=5):
             with e.points('xyseb') as points:
                 for point in points:
                     x, y, *_ = point
-                    min_x = min(min_x, x)
-                    max_x = max(max_x, x)
-                    min_y = min(min_y, y)
-                    max_y = max(max_y, y)
+                    all_points.append((x, y))
 
         elif dxftype == DXF_TYPE_CIRCLE:
             radius = e.dxf.radius
             center = e.dxf.center
 
-            min_x = min(min_x, center[0] - radius)
-            max_x = max(max_x, center[0] + radius)
-            min_y = min(min_y, center[1] - radius)
-            max_y = max(max_y, center[1] + radius)
+            all_points.append((center[0] - radius, center[1] - radius))
+            all_points.append((center[0] + radius, center[1] + radius))
 
         elif dxftype == DXF_TYPE_LINE:
             x1, y1, _ = e.dxf.start
             x2, y2, _ = e.dxf.end
 
-            min_x = min(min_x, x1)
-            max_x = max(max_x, x1)
-            min_y = min(min_y, y1)
-            max_y = max(max_y, y1)
-            min_x = min(min_x, x2)
-            max_x = max(max_x, x2)
-            min_y = min(min_y, y2)
-            max_y = max(max_y, y2)
+            all_points.append((x1, y1))
+            all_points.append((x2, y2))
 
         elif dxftype == DXF_TYPE_ARC:
             x1, y1, *_ = e.start_point
             x2, y2, *_ = e.end_point
+            radius = e.dxf.radius
+            center = e.dxf.center
 
-            min_x = min(min_x, x1)
-            max_x = max(max_x, x1)
-            min_y = min(min_y, y1)
-            max_y = max(max_y, y1)
-            min_x = min(min_x, x2)
-            max_x = max(max_x, x2)
-            min_y = min(min_y, y2)
-            max_y = max(max_y, y2)
+            all_points.append((x1, y1))
+            all_points.append((x2, y2))
+            all_points.append((center[0] - radius, center[1] - radius))
+            all_points.append((center[0] + radius, center[1] + radius))
 
         elif dxftype in {DXF_TYPE_TEXT, DXF_TYPE_INSERT, DXF_TYPE_MTEXT}:
             continue
 
         else:
-            raise ValueError(f'Unknown dxftype {dxftype}!')
+            logging.WARNING(f'Fehler -> {dxftype} is unknown.')
+            raise ValueError(f'Fehler: Unbekanntes CAD Element: {dxftype}')
+
+    min_x = min(all_points, key=lambda p: p[0])[0]
+    min_y = min(all_points, key=lambda p: p[1])[1]
+    max_x = max(all_points, key=lambda p: p[0])[0]
+    max_y = max(all_points, key=lambda p: p[1])[1]
 
     a = max_x - min_x + 2*offset
     b = max_y - min_y + 2*offset

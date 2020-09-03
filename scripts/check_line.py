@@ -1,8 +1,17 @@
 import ezdxf
 
 
-document = ezdxf.readfile('./docs/UM00056770-20mm-S235JR.dxf')
+DXF_TYPE_LWPOLYLINE = 'LWPOLYLINE'
+DXF_TYPE_CIRCLE = 'CIRCLE'
+DXF_TYPE_TEXT = 'TEXT'
+DXF_TYPE_MTEXT = 'MTEXT'
+DXF_TYPE_LINE = 'LINE'
+DXF_TYPE_ARC = 'ARC'
+DXF_TYPE_INSERT = 'INSERT'
+
+document = ezdxf.readfile('../tests/dxf/UM00056770-20mm-S235JR.dxf')
 msp = document.modelspace()
+
 
 for e in msp:
     dxftype = e.dxftype()

@@ -74,6 +74,16 @@ def test_get_min_square_circle_diamond_with_text():
     assert (a, b, area) == (12.0, 10.0, 120.0)
 
 
+def test_get_min_square_arc():
+    path = './dxf/UM00056770-20mm-S235JR.DXF'
+    msp = get_dxf_model_space(path)
+    a, b, area = get_min_square(msp, offset=0)
+    a = round(a, 1)
+    b = round(b, 1)
+
+    assert (a, b, area) == (97.0, 85.0, 8245.0)
+
+
 def test_get_min_square_unknown_element():
     path = './dxf/cube_mesh.dxf'
     with pytest.raises(ValueError):

@@ -7,7 +7,7 @@ from gui.gui import ApplicationGUI
 if __name__ == "__main__":
     now = datetime.datetime.now()
 
-    logging.basicConfig(filename='./logs/app.log', level=logging.DEBUG)
+    logging.basicConfig(filename='./logs/app.log', level=logging.WARNING)
     logging.debug(f'============================{now}===============================')
     logging.debug('Started')
 
