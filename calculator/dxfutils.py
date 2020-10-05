@@ -166,8 +166,8 @@ def get_min_square(msp, offset=5):
             all_points.append((x2, y2))
 
         elif dxftype == DXF_TYPE_ARC:
-            x1, y1, *_ = e.start_point
-            x2, y2, *_ = e.end_point
+            x1, y1, _ = e.start_point
+            x2, y2, _ = e.end_point
             radius = e.dxf.radius
             center = e.dxf.center
 
@@ -175,6 +175,9 @@ def get_min_square(msp, offset=5):
             all_points.append((x2, y2))
             all_points.append((center[0] - radius, center[1] - radius))
             all_points.append((center[0] + radius, center[1] + radius))
+
+            #farest_point = compute_farest_point(e)
+            #all_points.append(farest_point)
 
         elif dxftype in {DXF_TYPE_TEXT, DXF_TYPE_INSERT, DXF_TYPE_MTEXT}:
             continue
@@ -195,6 +198,27 @@ def get_min_square(msp, offset=5):
     b = max_y - min_y + 2*offset
 
     return a, b, round(a * b, 3)
+
+
+def compute_farest_point(e):
+    """
+    OUTMOST point on arc?!
+    """
+    center_x, center_y, *_ = e.dxf.center
+    start_angle = e.dxf.start_angle
+    end_angle = e.dxf.end_angle
+
+    #if start_angle > end_angle:
+        #rotation_angle = (start_angle - end_angle)/2
+        #rotation_angle += 180
+    #else:
+    rotation_angle = (end_angle - start_angle)/2
+
+    radius = e.dxf.radius
+    x = center_x + radius * math.cos(rotation_angle)
+    y = center_y + radius * math.sin(rotation_angle)
+
+    return x, y
 
 
 def get_dxf_model_space(path):

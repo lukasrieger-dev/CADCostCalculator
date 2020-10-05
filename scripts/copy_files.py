@@ -22,11 +22,7 @@ def write_to_txt(file_names_not_found):
         file.writelines(file_names_not_found)
 
 
-if __name__ == '__main__':
-    excel_path = input('Pfad + Name der Excel-Datei: ')
-    source_folder = input('Pfad zum Start-Ordner: ')
-    target_folder = input('Pfad zum Ziel-Ordner: ')
-
+def copy(excel_path, source_folder, target_folder):
     # Die Excel-Datei enthält eine Spalte mit Dateinamen, ohne Überschrift!
     xlsx = openpyxl.load_workbook(excel_path)
     sheet = xlsx.active
@@ -34,7 +30,7 @@ if __name__ == '__main__':
     values = sheet[dimensions]
     not_found = []
 
-    for file in values:
+    for lfdNr, menge, file, *_ in values:
         filename = file.value
         source_path = search_file(source_folder, filename)
         if not source_path:
@@ -44,3 +40,10 @@ if __name__ == '__main__':
         copyfile(source_path, target_folder + '/' + filename)
 
     write_to_txt(not_found)
+
+
+if __name__ == '__main__':
+    excel_path = input('Pfad + Name der Excel-Datei: ')
+    source_folder = input('Pfad zum Start-Ordner: ')
+    target_folder = input('Pfad zum Ziel-Ordner: ')
+    copy(excel_path, source_folder, target_folder)

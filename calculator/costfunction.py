@@ -18,6 +18,7 @@ def compute_cost(amount, file_path, height, speed, cut_speed_price_min, weight_g
     logging.debug(f'Gewicht/Teil: {round(part_weight_g/1000, 2)}kg')
 
     cost_per_g = material_cost_per_t / (1000 * 1000)
+
     # cost in Euro per g
     material_cost = part_weight_g * cost_per_g
     logging.debug(f'Materialkosten/Teil: {round(material_cost, 2)}€')

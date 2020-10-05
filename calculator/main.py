@@ -2,6 +2,7 @@ import openpyxl
 from calculator import costfunction
 from converter.converter import to_dxf_file
 from calculator import config
+from scripts.copy_files import copy
 import os.path
 
 
@@ -28,6 +29,17 @@ def calculate_excel(configuration, drawings_path, excel_file_path, tmp_file_path
     """
     Process the drawings referenced by the given excel file.
     """
+    cut_speeds = {
+        2: 60,
+        5: 50,
+        10: 25,
+        15: 10,
+        20: 5,
+        25: 3,
+    }
+    drawings_path += '/'
+    copy(excel_file_path, drawings_path, './Zeichnungen')
+
     xlsx = openpyxl.load_workbook(excel_file_path)
     sheet = xlsx.active
     min_dimension = 'A' + str(int(configuration.Nr_erste_Reihe_Daten))
@@ -43,10 +55,10 @@ def calculate_excel(configuration, drawings_path, excel_file_path, tmp_file_path
     # iterate over each line of the excel file
     for LfdNr, Liefermenge, ZeichnungsNr, Benennung, Dicke, Material in values:
         row_index += 1
-        file_path = drawings_path + '/' + ZeichnungsNr.value
+        file_path = './Zeichnungen/' + ZeichnungsNr.value
 
         if not os.path.exists(file_path):
-            raise ValueError(f'Datei existiert nicht: {file_path}')
+            continue
 
         file_path = check_convert_to_dxf(file_path, tmp_file_path)
 
@@ -54,7 +66,7 @@ def calculate_excel(configuration, drawings_path, excel_file_path, tmp_file_path
             Liefermenge.value,
             file_path,
             Dicke.value,
-            configuration.Schnittgeschwindigkeit_mm_s,
+            cut_speeds.get(int(Dicke.value), 1), #configuration.Schnittgeschwindigkeit_mm_s
             configuration.Kosten_Schnitt_euro_min,
             configuration.Materialgewicht_g_cm3,
             configuration.Materialkosten_euro_t,
