@@ -115,8 +115,8 @@ def get_edge_sum(msp):
             total_length += circumference
 
         elif dxftype == DXF_TYPE_ARC:
-            radius = e.dxf.end_angle - e.dxf.start_angle
-            total_length += get_arc_length_simple(e.dxf.radius, radius)
+            angle = e.dxf.end_angle - e.dxf.start_angle
+            total_length += get_arc_length_simple(e.dxf.radius, angle)
 
         elif dxftype == DXF_TYPE_LINE:
             x1, y1, _ = e.dxf.start

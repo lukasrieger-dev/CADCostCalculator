@@ -157,6 +157,12 @@ class ApplicationGUI(tk.Frame):
         except Exception as e:
             logging.error(e)
             messagebox.showerror('Berechnung abgebrochen!', f'Ein Fehler ist aufgetreten: {e}')
+        with open('./not_found.txt') as file:
+            lines = file.readlines()
+            if lines:
+                drawings = ','.join(lines)
+                messagebox.showwarning('Achtung!', f'Folgende Zeichnungen wurden nicht gefunden: {drawings}')
+
 
     def eval_checkbox(self):
         selected = self.use_excel.get()

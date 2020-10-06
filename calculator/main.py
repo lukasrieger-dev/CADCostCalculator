@@ -1,10 +1,10 @@
-import openpyxl
 from calculator import costfunction
 from converter.converter import to_dxf_file
 from calculator import config
-from scripts.copy_files import copy
 import os.path
-
+import openpyxl
+from shutil import copyfile
+from pathlib import Path
 
 __author__ = 'lukas'
 
@@ -17,12 +17,53 @@ def check_convert_to_dxf(file_path, tmp_file_path):
     """
     path = file_path
     try:
-        to_dxf_file(file_path, tmp_file_path)
-        path = tmp_file_path
+        file_ending = file_path[-3:]
+        if file_ending.upper() == '.GEO':
+            to_dxf_file(file_path, tmp_file_path)
+            path = tmp_file_path
     except UnicodeDecodeError:
         # file is already .dxf
         pass
     return path
+
+
+def search_file(start, filename):
+    """
+    Looks for the given filename starting at the start_folder
+    and returns the file path or None.
+    """
+    try:
+        return next(Path(start).rglob(filename))
+    except StopIteration:
+        return None
+
+
+def write_to_txt(file_names_not_found):
+    """
+    Write a list of lines (filenames) to a text file.
+    """
+    with open('./not_found.txt', 'w') as file:
+        file.writelines(file_names_not_found)
+
+
+def copy(excel_path, source_folder, target_folder, configuration):
+    # Die Excel-Datei enthält eine Spalte mit Dateinamen, ohne Überschrift!
+    xlsx = openpyxl.load_workbook(excel_path)
+    sheet = xlsx.active
+    c, r, sep, c2, r2 = sheet.dimensions
+    dimensions = c + str(configuration.Nr_erste_Reihe_Daten) + sep + c2 + r2
+    values = sheet[dimensions]
+    not_found = []
+
+    for lfdNr, menge, file, *_ in values:
+        filename = file.value
+        source_path = search_file(source_folder, filename)
+        if not source_path:
+            not_found.append(filename + '\n')
+            continue
+        copyfile(source_path, target_folder + '/' + filename)
+
+    write_to_txt(not_found)
 
 
 def calculate_excel(configuration, drawings_path, excel_file_path, tmp_file_path):
@@ -38,7 +79,7 @@ def calculate_excel(configuration, drawings_path, excel_file_path, tmp_file_path
         25: 3,
     }
     drawings_path += '/'
-    copy(excel_file_path, drawings_path, './Zeichnungen')
+    copy(excel_file_path, drawings_path, './Zeichnungen', configuration)
 
     xlsx = openpyxl.load_workbook(excel_file_path)
     sheet = xlsx.active
@@ -76,7 +117,10 @@ def calculate_excel(configuration, drawings_path, excel_file_path, tmp_file_path
 
         sum_of_all_cost += cost
         cell = configuration.Ausgabespalte + str(row_index)
-        sheet[cell] = format(cost, '.2f')
+        c = format(cost, '.2f')
+        c = str(c)
+        c = c.replace('.', ',')
+        sheet[cell] = c
 
     xlsx.save('./output.xlsx')
     return sum_of_all_cost
