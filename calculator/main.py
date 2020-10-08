@@ -18,7 +18,7 @@ def check_convert_to_dxf(file_path, tmp_file_path):
     path = file_path
     try:
         file_ending = file_path[-3:]
-        if file_ending.upper() == '.GEO':
+        if file_ending.upper() == 'GEO':
             to_dxf_file(file_path, tmp_file_path)
             path = tmp_file_path
     except UnicodeDecodeError:
@@ -47,7 +47,6 @@ def write_to_txt(file_names_not_found):
 
 
 def copy(excel_path, source_folder, target_folder, configuration):
-    # Die Excel-Datei enthält eine Spalte mit Dateinamen, ohne Überschrift!
     xlsx = openpyxl.load_workbook(excel_path)
     sheet = xlsx.active
     c, r, sep, c2, r2 = sheet.dimensions
@@ -70,6 +69,7 @@ def calculate_excel(configuration, drawings_path, excel_file_path, tmp_file_path
     """
     Process the drawings referenced by the given excel file.
     """
+    # hard coded material height -> speed table
     cut_speeds = {
         2: 60,
         5: 50,
@@ -107,7 +107,7 @@ def calculate_excel(configuration, drawings_path, excel_file_path, tmp_file_path
             Liefermenge.value,
             file_path,
             Dicke.value,
-            cut_speeds.get(int(Dicke.value), 1), #configuration.Schnittgeschwindigkeit_mm_s
+            cut_speeds.get(int(Dicke.value), 0), #configuration.Schnittgeschwindigkeit_mm_s TODO: Fehlermeldung wenn unbekannte Dicke
             configuration.Kosten_Schnitt_euro_min,
             configuration.Materialgewicht_g_cm3,
             configuration.Materialkosten_euro_t,
@@ -116,6 +116,8 @@ def calculate_excel(configuration, drawings_path, excel_file_path, tmp_file_path
         )
 
         sum_of_all_cost += cost
+
+        # comma instead of dot for prices
         cell = configuration.Ausgabespalte + str(row_index)
         c = format(cost, '.2f')
         c = str(c)

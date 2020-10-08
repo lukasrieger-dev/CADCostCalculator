@@ -1,4 +1,5 @@
 import tkinter as tk
+import tkinter.ttk as ttk
 from tkinter import filedialog, messagebox
 import calculator.main
 from gui.parameters_panel import ParametersPanel
@@ -27,7 +28,7 @@ class ApplicationGUI(tk.Frame):
         self.drawings_text.set('Pfad zu .GEO/.DXF Dateien')
 
         self.parent = parent
-        self.parent.title('Kostenrechner')
+        self.parent.title('Kostenrechner v1.0')
         self.parent.columnconfigure(0, weight=1)
 
         self.excel_path = tk.StringVar()
@@ -119,6 +120,7 @@ class ApplicationGUI(tk.Frame):
         #
         self.label_result = tk.Label(self, textvariable=self.cost_result, fg='black', font=self.app_font)
         self.label_result.grid(row=6, column=0, pady=(30, 3))
+        self.eval_checkbox()
 
     def open_filedialog_drawings(self):
         selected = self.use_excel.get()
@@ -140,16 +142,20 @@ class ApplicationGUI(tk.Frame):
             return
 
         selected = self.use_excel.get()
+        drawings_path = self.drawings_path.get()
+        if not drawings_path:
+            messagebox.showerror('Pfad zu Zeichnungen fehlt', 'Bitte einen Pfad für die Zeichnung(en) angeben.')
+            return
 
         try:
             if selected:
-                result = calculator.main.calculate(self.parameters, self.drawings_path.get(), self.excel_path.get())
+                result = calculator.main.calculate(self.parameters, drawings_path, self.excel_path.get())
             else:
                 try:
                     float(self.std_dicke_mm.get())
                 except ValueError:
                     raise ValueError('Bitte eine Zahl für die Dicke in mm eingeben.')
-                result = calculator.main.calculate(self.parameters, self.drawings_path.get())
+                result = calculator.main.calculate(self.parameters, drawings_path)
 
             cost = format(result, '.2f') + '€'
             msg = f'Berechnete Gesamtkosten: {cost}'
@@ -163,7 +169,6 @@ class ApplicationGUI(tk.Frame):
                 drawings = ','.join(lines)
                 messagebox.showwarning('Achtung!', f'Folgende Zeichnungen wurden nicht gefunden: {drawings}')
 
-
     def eval_checkbox(self):
         selected = self.use_excel.get()
 
@@ -175,6 +180,8 @@ class ApplicationGUI(tk.Frame):
             self.entry_excel_path.focus()
             self.drawings_path.set('')
             self.std_dicke_mm.set('---')
+            self.schnittgeschwindigkeit_mm_s.set('---')
+            self.parameters_panel.set_editable(False)
         else:
             self.entry_excel_path.grid_remove()
             self.button_open_filedialog_excel.grid_remove()
@@ -183,6 +190,8 @@ class ApplicationGUI(tk.Frame):
             self.entry_drawings_path.focus()
             self.drawings_path.set('')
             self.std_dicke_mm.set(self.parameters.get('Std_Dicke_mm', 20.0))
+            self.schnittgeschwindigkeit_mm_s.set(self.parameters.get('Schnittgeschwindigkeit_mm_s', 10.0))
+            self.parameters_panel.set_editable(True)
 
     def load_from_init_file(self):
         """

@@ -97,8 +97,7 @@ class ParametersPanel:
         if is_number(value):
             self.parent.parameters['Schnittgeschwindigkeit_mm_s'] = float(value)
         else:
-            msg += '\nSchnittgeschwindigkeit'
-            error = True
+            self.parent.parameters['Schnittgeschwindigkeit_mm_s'] = value
 
         value = self.entry_kosten_schnitt_euro_min.get()
         if is_number(value):
@@ -145,3 +144,11 @@ class ParametersPanel:
             messagebox.showerror("Fehlerhafte Eingaben", msg)
 
         return error
+
+    def set_editable(self, b):
+        if b:
+            self.entry_schnittgeschwindigkeit_mm_s['state'] = tk.NORMAL
+            self.entry_std_dicke_mm['state'] = tk.NORMAL
+        else:
+            self.entry_schnittgeschwindigkeit_mm_s['state'] = tk.DISABLED
+            self.entry_std_dicke_mm['state'] = tk.DISABLED
