@@ -71,12 +71,8 @@ def calculate_excel(configuration, drawings_path, excel_file_path, tmp_file_path
     """
     # hard coded material height -> speed table
     cut_speeds = {
-        2: 60,
-        5: 50,
-        10: 25,
-        15: 10,
-        20: 5,
-        25: 3,
+        1.5: 6.4, 2: 5.5, 3: 4.3, 4: 3.7, 5: 3.15, 6: 2.8, 8: 2.15,
+        10: 1.8, 12: 1.5, 15: 1, 16: 0.9, 20: 0.65,
     }
     drawings_path += '/'
     copy(excel_file_path, drawings_path, './Zeichnungen', configuration)
