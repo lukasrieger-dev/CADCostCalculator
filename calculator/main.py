@@ -65,15 +65,26 @@ def copy(excel_path, source_folder, target_folder, configuration):
     write_to_txt(not_found)
 
 
+def to_mm_s(s):
+    """
+    s is in m/min
+    """
+    return s * 1000/60
+
+
 def calculate_excel(configuration, drawings_path, excel_file_path, tmp_file_path):
     """
     Process the drawings referenced by the given excel file.
     """
-    # hard coded material height -> speed table
+    # hard coded material height -> speed table. In m/min
     cut_speeds = {
         1.5: 6.4, 2: 5.5, 3: 4.3, 4: 3.7, 5: 3.15, 6: 2.8, 8: 2.15,
         10: 1.8, 12: 1.5, 15: 1, 16: 0.9, 20: 0.65,
     }
+    # convert to mm/s!
+    cut_speeds = {k: to_mm_s(v) for k, v in cut_speeds.items()}
+    print(cut_speeds)
+
     drawings_path += '/'
     copy(excel_file_path, drawings_path, './Zeichnungen', configuration)
 
