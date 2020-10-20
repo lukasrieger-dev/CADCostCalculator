@@ -173,11 +173,11 @@ def get_min_square(msp, offset=5):
 
             all_points.append((x1, y1))
             all_points.append((x2, y2))
-            all_points.append((center[0] - radius, center[1] - radius))
-            all_points.append((center[0] + radius, center[1] + radius))
+            #all_points.append((center[0] - radius, center[1] - radius))
+            #all_points.append((center[0] + radius, center[1] + radius))
 
-            #farest_point = compute_farest_point(e)
-            #all_points.append(farest_point)
+            arc_points = compute_arc_points(e)
+            all_points.extend(arc_points)
 
         elif dxftype in {DXF_TYPE_TEXT, DXF_TYPE_INSERT, DXF_TYPE_MTEXT}:
             continue
@@ -194,31 +194,39 @@ def get_min_square(msp, offset=5):
     max_x = max(all_points, key=lambda p: p[0])[0]
     max_y = max(all_points, key=lambda p: p[1])[1]
 
-    a = max_x - min_x + 2*offset
-    b = max_y - min_y + 2*offset
+    a = distance_2d((min_x, 0), (max_x, 0)) + 2*offset
+    b = distance_2d((0, min_y), (0, max_y)) + 2*offset
 
     return a, b, round(a * b, 3)
 
 
-def compute_farest_point(e):
+def compute_arc_points(e):
     """
-    OUTMOST point on arc?!
+    3 points on the arc - This is a very rough approximation of the arc
     """
+    points = []
     center_x, center_y, *_ = e.dxf.center
     start_angle = e.dxf.start_angle
     end_angle = e.dxf.end_angle
 
-    #if start_angle > end_angle:
-        #rotation_angle = (start_angle - end_angle)/2
-        #rotation_angle += 180
-    #else:
+    radius = e.dxf.radius
+
     rotation_angle = (end_angle - start_angle)/2
 
-    radius = e.dxf.radius
     x = center_x + radius * math.cos(rotation_angle)
     y = center_y + radius * math.sin(rotation_angle)
+    points.append((x, y))
 
-    return x, y
+    # TODO: Diese Winkel passen nicht?!
+    x = center_x + radius * math.cos(rotation_angle/4)
+    y = center_y + radius * math.sin(rotation_angle/4)
+    #points.append((x, y))
+
+    x = center_x + radius * math.cos(3*rotation_angle/4)
+    y = center_y + radius * math.sin(3*rotation_angle/4)
+    #points.append((x, y))
+
+    return points
 
 
 def get_dxf_model_space(path):
